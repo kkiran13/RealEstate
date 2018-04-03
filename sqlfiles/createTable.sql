@@ -13,4 +13,3 @@ sqft INTEGER NULL,
 year_built INTEGER NULL,
 PRIMARY KEY (id)
 );
--- SORTKEY(property_id)

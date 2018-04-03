@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  mocks3:
+    image: meteogroup/s3mock
+    ports:
+      - "9444:9444"
+
+  mocksqs:
+    image: meteogroup/sqsmock
+    ports:
+      - "9324:9324"
+
+  targetdb:
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "postgres"
+    volumes:
+      - ./init_redshift.sql:/docker-entrypoint-initdb.d/init_redshift.sql
+      - ./sample.csv:/opt/sample.csv
+    ports:
+      - 5432:5432
+
+  etlapi:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - ./sample.csv:/opt/sample.csv
+    depends_on:
+      - mocksqs
+      - mocks3
+      - targetdb

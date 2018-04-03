@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  targetdb:
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "postgres"
+    volumes:
+      - ./init_redshift.sql:/docker-entrypoint-initdb.d/init_redshift.sql
+      - ./sample.csv:/opt/sample.csv
+    ports:
+      - 5432:5432
+
+  redisservice:
+    image: redis
+
+  webapi:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - redisservice
+      - targetdb
